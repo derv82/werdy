@@ -32,7 +32,7 @@ Sorts given wordlist(s) depending on options.
 
 * Ability to set minimum/maximum word length.
   * Ex: a minimum of 8, maxaximum of 63 would be useful for WPA wordlists.
-* Can receive multiple files drag-and-dropped onto the script.
+* Drag-and-drop multiple wordlist files to combine, sort, and remove duplicates.
 * Automatically removes duplicate entries. Option to disable this feature.
 * Split output file into multiple files of specific byte size.
 * "Frequency sort" sorts based on how frequently words appear. Option to display table with word counts.
