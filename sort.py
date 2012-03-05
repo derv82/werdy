@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/python
 # -*- coding: iso-8859-15 -*-
 
 """
@@ -202,9 +202,11 @@ def split(files):
     
     if not os.path.exists(file):
       print '\n file not found: "' + file + '"',
+      sys.stdout.flush()
       continue
     elif not os.path.isfile(file):
       print '\n skipping directory: "' + file + '"',
+      sys.stdout.flush()
       continue
     
     print ''
@@ -220,6 +222,7 @@ def split(files):
     while line:
       if words_total % update_every == 0: # only print out every so often so we are no encumbered by std out
         print '\r loading%s, words: %s (%.2f%%)  ' % (filename(file).rjust(rjust), format(words_in_file + words_created, ',d').rjust(njust), (100 * float(file_cur) / float(file_len))),
+        sys.stdout.flush()
       
       words_in_file += 1
       
@@ -307,16 +310,19 @@ def split(files):
           for elite_perm in leetify(line):
             if words_created % update_every == 0:
               print '\r loading%s, words: %s (%.2f%%)  ' % (filename(file).rjust(rjust), format(words_in_file + words_created, ',d').rjust(njust), (100 * float(file_cur) / float(file_len))),
+              sys.stdout.flush()
             lst.append(elite_perm)
             bytes_cur += len(elite_perm) + 1
             words_created += 1
             if bytes_cur >= chunk_size: 
               print '\r loading%s, words: %s *sorting*' % (filename(file).rjust(rjust), format(words_in_file + words_created, ',d').rjust(njust)),
+              sys.stdout.flush()
               
               lst.sort()         # sort the chunk
               still_sorted = True
               
               print '\r loading%s, words: %s *chunking*' % (filename(file).rjust(rjust), format(words_in_file + words_created, ',d').rjust(njust)),
+              sys.stdout.flush()
               
               o = open(temp_dir + str(split_file), 'wb') 
               for item in lst: # save the chunk
@@ -329,17 +335,20 @@ def split(files):
               bytes_cur = 0
               
               print '\r loading%s, words: %s (%.2f%%)  ' % (filename(file).rjust(rjust), format(words_in_file, ',d').rjust(njust), (100 * float(file_cur) / float(file_len))),
+              sys.stdout.flush()
       words_total += 1
       
       # check if we have exceeded the chunk size while iterating over this file
       if bytes_cur >= chunk_size: 
         print '\r loading%s, words: %s *sorting*' % (filename(file).rjust(rjust), format(words_in_file + words_created, ',d').rjust(njust)),
+        sys.stdout.flush()
         
         if not still_sorted: # the list is not already sorted
           lst.sort()         # sort the chunk
         still_sorted = True
         
         print '\r loading%s, words: %s *chunking*' % (filename(file).rjust(rjust), format(words_in_file + words_created, ',d').rjust(njust)),
+        sys.stdout.flush()
         
         o = open(temp_dir + str(split_file), 'wb') 
         for item in lst: # save the chunk
@@ -352,16 +361,19 @@ def split(files):
         bytes_cur = 0
         
         print '\r loading%s, words: %s           ' % (filename(file).rjust(rjust), format(words_in_file + words_created, ',d').rjust(njust)),
+        sys.stdout.flush()
         
       last = line
       line = i.readline()
     
     i.close()
     print '\r loaded %s, words: %s           ' % (filename(file).rjust(rjust), format(words_in_file + words_created, ',d').rjust(njust)),
+    sys.stdout.flush()
     
     if delete_input:
       os.remove(file)
       print '\r loaded %s, words: %s *deleted* ' % (filename(file).rjust(rjust), format(words_in_file + words_created, ',d').rjust(njust)),
+      sys.stdout.flush()
   
   # at this point, we are done extracting data from the list of input files
   
@@ -372,11 +384,13 @@ def split(files):
   # check if there are still items left in the chunk to be saved
   if len(lst) > 0:
     print '\r loaded %s, words: %s *sorting*' % (filename(file).rjust(rjust), format(words_in_file + words_created, ',d').rjust(njust)),
+    sys.stdout.flush()
     
     if not still_sorted: # the list is not already sorted
       lst.sort()         # sort the chunk
     
     print '\r loaded %s, words: %s *chunking*' % (filename(file).rjust(rjust), format(words_in_file + words_created, ',d').rjust(njust)),
+    sys.stdout.flush()
     
     o = open(temp_dir + str(split_file), 'wb')
     o.write('\n'.join(lst)) # save the chunk
@@ -385,10 +399,12 @@ def split(files):
     del lst[:]
     split_file += 1
     print '\r loaded %s, words: %s            ' % (filename(file).rjust(rjust), format(words_in_file + words_created, ',d').rjust(njust)),
+    sys.stdout.flush()
     
     if delete_input:
       #os.remove(file)
       print '\r loaded %s, words: %s *deleted* ' % (filename(file).rjust(rjust), format(words_in_file + words_created, ',d').rjust(njust)),
+      sys.stdout.flush()
       
   print '\n        ' + ('%d files' % (files_loaded)).rjust(rjust) + ', total: %s words' % (format(words_kept + words_created, ',d')).rjust(njust)
   
@@ -438,8 +454,10 @@ def merge(chunks, file):
     if count % update_every == 0:
       if freq_flag:
         print '\r counting words: %s (%.3f%%)' % (format(words_in_file, ',d').rjust(njust), 100 * float(bytes_cur) / float(bytes_ttl)),
+        sys.stdout.flush()
       else:
         print '\r saving ' + filename(saving_to).rjust(rjust) + ', words: %s (%.3f%%)' % (format(words_in_file, ',d').rjust(njust), 100 * float(bytes_cur) / float(bytes_ttl)),
+        sys.stdout.flush()
     
     bytes_cur += len(line)
     
@@ -487,6 +505,7 @@ def merge(chunks, file):
   if freq_flag and len(freq_list) > 0:
     print '\r counting words: %s (%.3f%%)' % (format(words_in_file, ',d').rjust(njust), 100 * float(bytes_cur) / float(bytes_ttl)),
     print '\n frequency sort: *sorting*...',
+    sys.stdout.flush()
     
     freq_list.sort(reverse=True)
     

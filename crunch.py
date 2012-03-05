@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import sys, os, time
 
 """
@@ -355,7 +357,7 @@ def sectotime(sec):
 # print the hlp screen
 def help():
   p("""
- USAGE: python crunch.py [OPTIONS]
+ USAGE: python crunch.py -m <min> -M <max> [OPTIONS]
 
  OPTIONS:
   
@@ -456,6 +458,10 @@ def parse(args):
       sys.exit(0)
     i += 1
   
+  if len(args) == 0:
+    help()
+    exit(1)
+
   if length_min == 0:
     if mask == '':
       p('\n no minimum/maximum length given!')
