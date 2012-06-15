@@ -24,6 +24,68 @@ file = 'phone.txt'
 
 no_area = False
 
+STATES = []
+STATES.append(("ALABAMA ", "AL"))
+STATES.append(("ALASKA ", "AK"))
+STATES.append(("AMERICAN SAMOA ", "AS"))
+STATES.append(("ARIZONA ", "AZ"))
+STATES.append(("ARKANSAS ", "AR"))
+STATES.append(("CALIFORNIA ", "CA"))
+STATES.append(("COLORADO ", "CO"))
+STATES.append(("CONNECTICUT ", "CT"))
+STATES.append(("DELAWARE ", "DE"))
+STATES.append(("DISTRICT OF COLUMBIA ", "DC"))
+STATES.append(("FEDERATED STATES OF MICRONESIA ", "FM"))
+STATES.append(("FLORIDA ", "FL"))
+STATES.append(("GEORGIA ", "GA"))
+STATES.append(("GUAM GU ", "GU"))
+STATES.append(("HAWAII ", "HI"))
+STATES.append(("IDAHO ", "ID"))
+STATES.append(("ILLINOIS ", "IL"))
+STATES.append(("INDIANA ", "IN"))
+STATES.append(("IOWA ", "IA"))
+STATES.append(("KANSAS ", "KS"))
+STATES.append(("KENTUCKY ", "KY"))
+STATES.append(("LOUISIANA ", "LA"))
+STATES.append(("MAINE ", "ME"))
+STATES.append(("MARSHALL ISLANDS ", "MH"))
+STATES.append(("MARYLAND ", "MD"))
+STATES.append(("MASSACHUSETTS ", "MA"))
+STATES.append(("MICHIGAN ", "MI"))
+STATES.append(("MINNESOTA ", "MN"))
+STATES.append(("MISSISSIPPI ", "MS"))
+STATES.append(("MISSOURI ", "MO"))
+STATES.append(("MONTANA ", "MT"))
+STATES.append(("NEBRASKA ", "NE"))
+STATES.append(("NEVADA ", "NV"))
+STATES.append(("NEW HAMPSHIRE ", "NH"))
+STATES.append(("NEW JERSEY ", "NJ"))
+STATES.append(("NEW MEXICO ", "NM"))
+STATES.append(("NEW YORK ", "NY"))
+STATES.append(("NORTH CAROLINA ", "NC"))
+STATES.append(("NORTH DAKOTA ", "ND"))
+STATES.append(("NORTHERN MARIANA ISLANDS ", "MP"))
+STATES.append(("OHIO ", "OH"))
+STATES.append(("OKLAHOMA ", "OK"))
+STATES.append(("OREGON ", "OR"))
+STATES.append(("PALAU ", "PW"))
+STATES.append(("PENNSYLVANIA ", "PA"))
+STATES.append(("PUERTO RICO ", "PR"))
+STATES.append(("RHODE ISLAND ", "RI"))
+STATES.append(("SOUTH CAROLINA ", "SC"))
+STATES.append(("SOUTH DAKOTA ", "SD"))
+STATES.append(("TENNESSEE ", "TN"))
+STATES.append(("TEXAS ", "TX"))
+STATES.append(("UTAH ", "UT"))
+STATES.append(("VERMONT ", "VT"))
+STATES.append(("VIRGIN ISLANDS ", "VI"))
+STATES.append(("VIRGINIA ", "VA"))
+STATES.append(("WASHINGTON ", "WA"))
+STATES.append(("WEST VIRGINIA ", "WV"))
+STATES.append(("WISCONSIN ", "WI"))
+STATES.append(("WYOMING ", "WY"))
+
+
 # Looks through a source string for all items between two other strings, 
 # returns the list of items (or empty list if none are found)
 def between(source, start, finish):
@@ -152,16 +214,18 @@ def autopwn():
   s = between(r, '<tr><th>Region:</th><td>', '</td></tr>')
   if len(c) == 0 or len(s) == 0:
     return ''
-  
+
+  if 'Region:' in c[0] or 'Country:' in s[0]: return ''
+
   state = ''
-  r = getweb('http://www.usps.com/ncsc/lookups/abbreviations.html')
-  usps = between(r, '<TT>', '</TT>')
-  for i in xrange(0, len(usps)):
-    if usps[i].lower() == s[0].lower():
-      state = ',' + usps[i+1]
+  for st in STATES:
+    # print st[0].replace('\t', '').strip()
+    print state
+    if s[0].upper() == st[0].replace('\t', '').strip():
+      state = st[1]
       break
   
-  return c[0].replace(' ', '+') + state
+  return c[0].replace(' ', '+') + "+" + state
 
 
 def parse_args(args):
@@ -229,12 +293,13 @@ def main(args):
   if area == '' and city == '':
     print ' * CITY or AREA CODE required!'
     print ' attempting to lookup city,state based on your ip address...',
+    sys.stdout.flush()
     city = autopwn()
     if city == '':
       print 'unsuccessful!'
       print ' to input a city, type -city ALBUQUERQUE'
       print ' to input an area code, type -area 505'
-      print '\n type python phone.py ? for more detailed instructions'
+      print '\n type python phone.py -h for more detailed instructions'
       sys.exit(0)
     print 'found "' + city + '"'
     file = city + '-' + file
