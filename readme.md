@@ -2,7 +2,7 @@
 
 ## Description
 
-A series of Python scripts for generating, merging, and sorting wordlist files.
+A series of Python 2.7.x scripts for generating, merging, and sorting wordlist files.
 
 ## crunch.py
 
