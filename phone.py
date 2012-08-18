@@ -220,7 +220,6 @@ def autopwn():
   state = ''
   for st in STATES:
     # print st[0].replace('\t', '').strip()
-    print state
     if s[0].upper() == st[0].replace('\t', '').strip():
       state = st[1]
       break
