@@ -78,12 +78,12 @@ length_max   = 0      # -M
 remove_dupes = True   # -d
 
 # size to split the output file into (output files will not exceed this number of bytes)
-split_size   = 1024 * 1024 * 1024 * 1 # 1GB
+split_size   = 1024 * 1024 * 1024 * 10 # 10GB
 
 # size to split input files into (use a smaller number for less RAM usage)
-chunk_size   = 1024 * 1024 * 75       # 75MB
+chunk_size   = 1024 * 1024 * 500       # 500MB
 
-update_every = 25000    # every ___ words to update percentages
+update_every = 50000    # every ___ words to update percentages
 
 left_sep      = ''      # left separator
 right_sep     = ''      # right separator
@@ -278,7 +278,15 @@ def split(files):
       
       if save: # if we are still supposed to save it, do it
         bytes_cur += len(line) + 1
-        lst.append(line)
+
+
+
+        #check if we have to convert case
+        if convert_case:
+          converted_line = convert(line, convert_case)
+          lst.append(converted_line)
+        else:
+          lst.append(line)
         words_kept += 1
         
         if still_sorted and cmp(last, line) > 0:
