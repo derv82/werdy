@@ -29,6 +29,12 @@ class Date:
 		if self.month != other.month: return self.month - other.month
 		if self.day   != other.day:   return self.day   - other.day
 		return 0
+	def __lt__(self, other):
+		return self.__cmp__(other) < 0
+	def __gt__(self, other):
+		return self.__cmp__(other) > 0
+	def __eq__(self, other):
+		return self.__cmp__(other) == 0
 	
 	def __str__(self):
 		result = self.format
@@ -91,7 +97,7 @@ class Date:
 				self.year = 0
 
 def usage():
-	print '''
+	print ('''
 / dates generator /
 
 usage:
@@ -125,7 +131,7 @@ examples:
   
 	# To dump the dates to an 'output' file:
 	./dates.py 1970-1-1 2000-1-1 > output.txt
-'''
+''')
 
 """ Retrieves start date, end date, and format to output """
 def parse_input():
@@ -178,19 +184,19 @@ def main():
 	start_date = parse_date(start)
 	stop_date  = parse_date(stop)
 	if start_date == None or stop_date == None:
-		print '  unexpected year input(s): %s and %s' % (start, stop)
-		print '  use format:  YYYY-MM-DD'
-		print '  for example: 1970-01-01'
+		print ('  unexpected year input(s): %s and %s' % (start, stop))
+		print ('  use format:  YYYY-MM-DD')
+		print ('  for example: 1970-01-01')
 		sys.exit(1)
 	start_date.set_format(format)
-	print start_date
+	print (start_date)
 	while (start_date < stop_date):
 		start_date.next()
-		print start_date
+		print (start_date)
 
 
 if __name__ == '__main__':
 	try:
 		main()
 	except KeyboardInterrupt:
-		print '\n(^C) interrupted'
+		print ('\n(^C) interrupted')
