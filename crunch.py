@@ -16,6 +16,11 @@ python crunch.py -lower -m 8 | aircrack-ng.exe -a 2 -w - -e "<ROUTER ESSID>" <CA
 
 """
 
+try:
+        xrange  
+except:
+        xrange=range()
+
 length_min = 0
 length_max = 0
 
