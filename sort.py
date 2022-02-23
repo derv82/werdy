@@ -26,6 +26,8 @@ What this script does:
     duplicates will most likely be created.
     the disk space used could multiply for each case type used
     ex: using lcase and ucase may cause the disk space used to be 3x original file size.
+
+ * convert_case is now working (lower upper first leetify)
     
 // TODO:
  
@@ -35,9 +37,7 @@ What this script does:
  * alter 'freq sort' so that when the max chunk size is reached,
     it removes all elements of frequency freq_min or less, and increments freq_min += 1
  
- * create copy of elite text
- 
- * convert text to 'elite'
+ * create copy of leetify text
  
  * specify that '-w' only removes whitespace characters AT THE BEGINNING/END of the line!!
     update help() to show this.
@@ -78,12 +78,12 @@ length_max   = 0      # -M
 remove_dupes = True   # -d
 
 # size to split the output file into (output files will not exceed this number of bytes)
-split_size   = 1024 * 1024 * 1024 * 1 # 1GB
+split_size   = 1024 * 1024 * 1024 * 10 # 10GB
 
 # size to split input files into (use a smaller number for less RAM usage)
-chunk_size   = 1024 * 1024 * 75       # 75MB
+chunk_size   = 1024 * 1024 * 500       # 500MB
 
-update_every = 25000    # every ___ words to update percentages
+update_every = 50000    # every ___ words to update percentages
 
 left_sep      = ''      # left separator
 right_sep     = ''      # right separator
@@ -106,7 +106,7 @@ convert_case = '' # case to convert to, lcase, ucase, first
 copy_lower = False
 copy_upper = False
 copy_first = False
-copy_elite = False
+copy_leetify = False
 
 delete_input = False # delete the input file(s) after data is parsed.
 
@@ -129,6 +129,10 @@ def convert(word, case):
     return word.upper()
   elif case == 'first':
     return word[0].upper() + word[1:].lower()
+  elif case == 'leetify':
+    for leet in leetify(word):
+      return leet
+    
   return word
 
 # generator for leet speak text
@@ -189,7 +193,7 @@ def split(files):
   global length_min, length_max, split_size, remove_dupes, update_every
   global words_removed_short, words_removed_long, words_removed_blank, words_removed_del
   global left_sep, right_sep, delete_string, strip_whitespace, convert_case
-  global copy_lower, copy_upper, copy_first, copy_elite, strip_nonprinting
+  global copy_lower, copy_upper, copy_first, copy_leetify, strip_nonprinting
   
   split_file = 0  # current chunk filename we are creating
   bytes_cur  = 0  # current amount of bytes in this chunk (not to exceed chunk_size)
@@ -278,7 +282,15 @@ def split(files):
       
       if save: # if we are still supposed to save it, do it
         bytes_cur += len(line) + 1
-        lst.append(line)
+
+
+
+        #check if we have to convert case
+        if convert_case:
+          converted_line = convert(line, convert_case)
+          lst.append(converted_line)
+        else:
+          lst.append(line)
         words_kept += 1
         
         if still_sorted and cmp(last, line) > 0:
@@ -305,14 +317,14 @@ def split(files):
             bytes_cur += len(temp) + 1
             words_created += 1
       
-        if copy_elite:
+        if copy_leetify:
           if still_sorted: still_sorted = False
-          for elite_perm in leetify(line):
+          for leetify_perm in leetify(line):
             if words_created % update_every == 0:
               print '\r loading%s, words: %s (%.2f%%)  ' % (filename(file).rjust(rjust), format(words_in_file + words_created, ',d').rjust(njust), (100 * float(file_cur) / float(file_len))),
               sys.stdout.flush()
-            lst.append(elite_perm)
-            bytes_cur += len(elite_perm) + 1
+            lst.append(leetify_perm)
+            bytes_cur += len(leetify_perm) + 1
             words_created += 1
             if bytes_cur >= chunk_size: 
               print '\r loading%s, words: %s *sorting*' % (filename(file).rjust(rjust), format(words_in_file + words_created, ',d').rjust(njust)),
@@ -645,13 +657,13 @@ def help():
   print "              WARNING: this will PERMANENTLY DELETE ALL FILES you pass to it"
   print "              this option only requires 1X input size free space instead of 2X"
   print ""
-  print "   -convert $ convert lines to $ case: lower, upper, first, elite."
+  print "   -convert $ convert lines to $ case: lower, upper, first, leetify."
   print "              ex: to convert list to lower-case, type: -convert lower"
   print ""
   print "   -lower     save copies of each line as lower-case"
   print "   -upper     save a copy of each line as UPPER-CASE"
   print "   -first     save a copy of each line as First Letter Capitalized"
-  print "   -elite     save a copy of each line as elite (31337)"
+  print "   -leetify     save a copy of each line as leetify (31337)"
   print ""
   print " example: python sort.py -m 8 -M 63 *.txt"
 
@@ -808,7 +820,7 @@ def parse_args(args):
   global split_size, chunk_size, outfile
   global left_sep, right_sep, delete_string, strip_whitespace
   global freq_flag, freq_show_count, delete_input
-  global convert_case, copy_lower, copy_upper, copy_first, copy_elite
+  global convert_case, copy_lower, copy_upper, copy_first, copy_leetify
   global strip_nonprinting
   
   result, i = [], 0
@@ -957,9 +969,9 @@ def parse_args(args):
       print ' * first-letter-upper copies enabled'
       printed = True
       
-    elif x == '-elite' or x == '--elite':
-      copy_elite = True
-      print ' * elite (leetspeak) mutations enabled'
+    elif x == '-leetify' or x == '--leetify':
+      copy_leetify = True
+      print ' * leetify (leetspeak) mutations enabled'
       printed = True
       
     else:
